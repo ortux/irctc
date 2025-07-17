@@ -101,7 +101,7 @@ async function refreshAvailability(button) {
     };
 
     // This assumes your proxy is set up at 'http://localhost/irctc/proxy.php'
-    const proxyUrl = 'https://bai-dev.xyz/irctc/proxy.php';
+    const proxyUrl = 'https://bai-dev.xyz/irctc/api2.php';
 
     try {
         const response = await fetch(proxyUrl, {
