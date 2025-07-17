@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Train Booking - Book Your Journey</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .bg-train {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url('../assets/backgrouund.jpeg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+        }
+
+        .dropdown {
+            max-height: 240px;
+            overflow-y: auto;
+        }
+
+        .dropdown::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .dropdown::-webkit-scrollbar-track {
+            background: #f8fafc;
+        }
+
+        .dropdown::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        .dropdown::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .station-item {
+            transition: all 0.15s ease;
+        }
+
+        .station-item:hover {
+            background-color: #f1f5f9;
+            transform: translateX(2px);
+        }
+
+        .loading-spinner {
+            border: 2px solid #f3f4f6;
+            border-top: 2px solid #3b82f6;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .glass-card {
+            backdrop-filter: blur(15px);
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-btn {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+        }
+
+        .search-btn:hover {
+            background: linear-gradient(135deg, #d97706, #b45309);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.5);
+        }
+
+        .input-focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .slide-down {
+            animation: slideDown 0.2s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-train min-h-screen">
+    <!-- Header -->
+    <header
+        class="bg-black bg-opacity-30 backdrop-blur-md text-white p-4 shadow-lg border-b border-white border-opacity-10">
+        <nav
+            class="bg-white dark:bg-gray-900 fixed w-full z-20 top-0 start-0 border-b border-gray-200 dark:border-gray-600">
+            <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+                <a href="https://flowbite.com/" class="flex items-center space-x-3 rtl:space-x-reverse">
+
+                    <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">🚂
+                        BharatRail</span>
+                </a>
+                <div class="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
+                    <button type="button"
+                        class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Get
+                        started</button>
+                    <!-- ▼▼▼ FIX 1: ADDED id="mobile-menu-toggle" HERE ▼▼▼ -->
+                    <button id="mobile-menu-toggle" data-collapse-toggle="navbar-sticky" type="button"
+                        class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+                        aria-controls="navbar-sticky" aria-expanded="false">
+                        <span class="sr-only">Open main menu</span>
+                        <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 17 14">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M1 1h15M1 7h15M1 13h15" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1" id="navbar-sticky">
+                    <ul
+                        class="flex flex-col p-4 md:p-0 mt-4 font-medium border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
+                        <li>
+                            <a href="./../home/"
+                                class="block py-2 px-3 text-white bg-blue-700 rounded-sm md:bg-transparent md:text-blue-700 md:p-0 md:dark:text-blue-500"
+                                aria-current="page">Home</a>
+                        </li>
+                        <li>
+                            <a href="./../status/"
+                                class="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">PNR
+                                STATUS</a>
+                        </li>
+                        <li>
+                            <a href="./../train_status"
+                                class="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Live
+                                Train Status</a>
+                        </li>
+                        <li>
+                            <a href="#"
+                                class="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Feedback</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8 mt-8">
+        <div class="text-center mb-12">
+            <h1 class="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-lg">
+                Book Your Journey
+            </h1>
+            <p class="text-xl text-gray-100 max-w-2xl mx-auto drop-shadow-lg">
+                Fast, reliable train booking with instant station search
+            </p>
+        </div>
+
+        <!-- Booking Form -->
+        <div class="max-w-5xl mx-auto glass-card rounded-2xl shadow-2xl p-8">
+            <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">Find Trains</h2>
+
+            <form id="search-form" class="space-y-8">
+                <!-- Station Selection Row -->
+                <div class="relative flex flex-col lg:flex-row items-center space-y-6 lg:space-y-0 lg:space-x-6">
+                    <!-- From Station -->
+                    <div class="relative w-full lg:flex-1">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            From Station
+                        </label>
+                        <div class="relative">
+                            <input type="text" id="fromStation" placeholder="Enter departure station"
+                                class="w-full px-4 py-4 border-2 border-gray-300 rounded-xl focus:outline-none transition-all duration-200"
+                                autocomplete="off" required>
+                            <div id="fromSpinner" class="absolute right-4 top-4 hidden">
+                                <div class="loading-spinner"></div>
+                            </div>
+                        </div>
+                        <div id="fromDropdown"
+                            class="absolute z-50 w-full bg-white border border-gray-200 rounded-xl shadow-xl mt-2 hidden dropdown slide-down">
+                        </div>
+                    </div>
+
+                    <!-- Swap Button -->
+                    <div class="flex-shrink-0 lg:mt-8">
+                        <button type="button" id="swapBtn"
+                            class="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg transition-all duration-200 transform hover:scale-110">
+                            <svg class="w-6 h-6 rotate-90 lg:rotate-0" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- To Station -->
+                    <div class="relative w-full lg:flex-1">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            To Station
+                        </label>
+                        <div class="relative">
+                            <input type="text" id="toStation" placeholder="Enter destination station"
+                                class="w-full px-4 py-4 border-2 border-gray-300 rounded-xl focus:outline-none transition-all duration-200"
+                                autocomplete="off" required>
+                            <div id="toSpinner" class="absolute right-4 top-4 hidden">
+                                <div class="loading-spinner"></div>
+                            </div>
+                        </div>
+                        <div id="toDropdown"
+                            class="absolute z-50 w-full bg-white border border-gray-200 rounded-xl shadow-xl mt-2 hidden dropdown slide-down">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Options Row -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Journey Date</label>
+                        <input type="date" id="journeyDate"
+                            class="w-full px-4 py-4 border-2 border-gray-300 rounded-xl focus:outline-none transition-all duration-200"
+                            required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Class</label>
+                        <select id="classSelect"
+                            class="w-full px-4 py-4 border-2 border-gray-300 bg-white rounded-xl focus:outline-none transition-all duration-200">
+                            <option value="ALL">All Classes</option>
+                            <option value="SL">Sleeper (SL)</option>
+                            <option value="3A">AC 3 Tier (3A)</option>
+                            <option value="2A">AC 2 Tier (2A)</option>
+                            <option value="1A">AC First Class (1A)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Quota</label>
+                        <select id="quotaSelect"
+                            class="w-full px-4 py-4 border-2 border-gray-300 bg-white rounded-xl focus:outline-none transition-all duration-200">
+                            <option value="GN">General</option>
+                            <option value="TQ">Tatkal</option>
+                            <option value="LD">Ladies</option>
+                            <option value="SS">Senior Citizen</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Search Button -->
+                <div class="pt-6">
+                    <button type="submit"
+                        class="w-full search-btn text-white font-bold py-4 px-8 rounded-xl text-lg transition-all duration-200 flex items-center justify-center space-x-3">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        <span>Search Trains</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Quick Access -->
+        <div class="max-w-5xl mx-auto mt-8 text-center">
+            <h3 class="text-xl font-semibold text-white mb-4 drop-shadow-md">Popular Routes</h3>
+            <div class="flex flex-wrap justify-center gap-3">
+                <button
+                    class="bg-white bg-opacity-25 hover:bg-opacity-35 backdrop-blur-sm text-white px-4 py-2 rounded-full transition-all duration-200 shadow-lg"
+                    onclick="setRoute('NEW DELHI', 'NDLS', 'MUMBAI CENTRAL', 'MMCT')">Delhi → Mumbai</button>
+                <button
+                    class="bg-white bg-opacity-25 hover:bg-opacity-35 backdrop-blur-sm text-white px-4 py-2 rounded-full transition-all duration-200 shadow-lg"
+                    onclick="setRoute('HOWRAH JN', 'HWH', 'NEW DELHI', 'NDLS')">Kolkata → Delhi</button>
+                <button
+                    class="bg-white bg-opacity-25 hover:bg-opacity-35 backdrop-blur-sm text-white px-4 py-2 rounded-full transition-all duration-200 shadow-lg"
+                    onclick="setRoute('CHENNAI CENTRAL', 'MAS', 'NEW DELHI', 'NDLS')">Chennai → Delhi</button>
+                <button
+                    class="bg-white bg-opacity-25 hover:bg-opacity-35 backdrop-blur-sm text-white px-4 py-2 rounded-full transition-all duration-200 shadow-lg"
+                    onclick="setRoute('BANGALORE CITY', 'BNC', 'NEW DELHI', 'NDLS')">Bangalore → Delhi</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer
+        class="bg-black bg-opacity-40 backdrop-blur-md text-white mt-16 py-8 border-t border-white border-opacity-10">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-blue-100">© 2025 RailBook. Fast & Reliable Train Booking Platform.</p>
+        </div>
+    </footer>
+
+    <script src="../backend/index.js"></script>
+    <script src="./../backend/navbar.js"></script>
+</body>
+
+</html>

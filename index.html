@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecting...</title>
+    
+    <!-- Meta redirect (fallback) -->
+    <meta http-equiv="refresh" content="0; url=https://your-target-page.com">
+    
+    <!-- Immediate JavaScript redirect -->
+    <script>
+        window.location.replace("./home/");
+    </script>
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+            background-color: #f5f5f5;
+        }
+        .redirect-message {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .manual-link {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .manual-link:hover {
+            text-decoration: underline;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="redirect-message">
+        Redirecting you to the main page...
+        <div class="loading"></div>
+    </div>
+    
+    <p>If you are not redirected automatically, 
+        <a href="./home/" class="manual-link">click here</a>
+    </p>
+</body>
+</html>

@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Train Search Results</title>
+    <!-- 
+      PRODUCTION NOTE: Using a CDN for Tailwind is great for development and demos.
+      For a real production environment, it is highly recommended to install Tailwind CSS
+      as a PostCSS plugin and use a build tool (like Vite, Parcel, or Webpack) to
+      process and purge unused styles for a much smaller final CSS file.
+      See: https://tailwindcss.com/docs/installation
+    -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .mobile-menu {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .mobile-menu.active {
+            transform: translateX(0);
+        }
+
+        .hamburger span {
+            display: block;
+            width: 25px;
+            height: 3px;
+            background-color: white;
+            margin: 5px 0;
+            transition: 0.3s;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -6px);
+        }
+
+        /* CSS Variables for easier theming */
+        :root {
+            --primary-color: #3b82f6;
+            --primary-color-hover: #2563eb;
+            --danger-color: #ef4444;
+            --success-color: #10b981;
+            --light-gray: #f3f4f6;
+        }
+
+        .loading-spinner {
+            border: 4px solid var(--light-gray);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        .mini-spinner {
+            display: inline-block;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid #fff;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .train-card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+
+        .train-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+
+        /* Availability badge styling */
+        .availability-available {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .availability-rac {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .availability-waitlist {
+            background-color: #ffedd5;
+            color: #9a3412;
+        }
+
+        .availability-not-available {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .availability-info {
+            background-color: #e0e7ff;
+            color: #3730a3;
+        }
+
+        .availability-refresh {
+            background-color: #f0f9ff;
+            color: #075985;
+        }
+
+        /* Filter button styling */
+        .filter-btn {
+            transition: all 0.2s;
+        }
+
+        .filter-btn.active {
+            background-color: var(--primary-color) !important;
+            color: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 font-sans">
+
+
+    <nav
+        class="bg-white dark:bg-gray-900 fixed w-full z-20 top-0 start-0 border-b border-gray-200 dark:border-gray-600">
+        <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+            <a href="https://flowbite.com/" class="flex items-center space-x-3 rtl:space-x-reverse">
+
+                <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">🚂 BharatRail</span>
+            </a>
+            <div class="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
+                <button type="button"
+                    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Get
+                    started</button>
+                <!-- ▼▼▼ FIX 1: ADDED id="mobile-menu-toggle" HERE ▼▼▼ -->
+                <button id="mobile-menu-toggle" data-collapse-toggle="navbar-sticky" type="button"
+                    class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+                    aria-controls="navbar-sticky" aria-expanded="false">
+                    <span class="sr-only">Open main menu</span>
+                    <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 17 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M1 1h15M1 7h15M1 13h15" />
+                    </svg>
+                </button>
+            </div>
+            <div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1" id="navbar-sticky">
+                <ul
+                    class="flex flex-col p-4 md:p-0 mt-4 font-medium border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
+                    <li>
+                        <a href="./../home/"
+                            class="block py-2 px-3 text-white bg-blue-700 rounded-sm md:bg-transparent md:text-blue-700 md:p-0 md:dark:text-blue-500"
+                            aria-current="page">Home</a>
+                    </li>
+                    <li>
+                        <a href="./../status/"
+                            class="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">PNR
+                            STATUS</a>
+                    </li>
+                    <li>
+                        <a href="./../train_status"
+                            class="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Live
+                            Train Status</a>
+                    </li>
+                    <li>
+                        <a href="#"
+                            class="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Feedback</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div id="app-container" class="min-h-screen">
+        <header class="bg-white shadow-sm sticky top-0 z-10 pt-16"> <!-- Added padding-top to account for fixed nav -->
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+                    <div>
+                        <h1 class="text-xl md:text-2xl font-bold text-gray-900">Train Search Results</h1>
+                        <div class="flex items-center space-x-2 text-sm text-gray-600 mt-1">
+                            <span class="font-semibold text-gray-800" id="fromStation"></span>
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                            </svg>
+                            <span class="font-semibold text-gray-800" id="toStation"></span>
+                        </div>
+                    </div>
+                    <div class="text-left sm:text-right text-sm">
+                        <p id="journeyDate" class="font-medium"></p>
+                        <p id="classQuota" class="text-gray-500"></p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <!-- Loading State -->
+            <div id="loadingState" class="flex flex-col items-center justify-center py-20 text-center">
+                <div class="loading-spinner mb-4"></div>
+                <p class="text-lg font-medium text-gray-700">Hold on, we're finding the best routes for you...</p>
+                <p class="text-gray-500">This may take a moment.</p>
+            </div>
+
+            <!-- Error State -->
+            <div id="errorState"
+                class="hidden text-center p-8 bg-red-50 border-2 border-dashed border-red-200 rounded-lg">
+                <svg class="w-12 h-12 mx-auto text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <h3 class="mt-2 text-xl font-semibold text-red-800">Oops! Something went wrong.</h3>
+                <p id="errorMessage" class="mt-1 text-red-600"></p>
+            </div>
+
+            <!-- Results Container -->
+            <div id="resultsContainer" class="hidden">
+                <!-- Filter Section -->
+                <details class="bg-white rounded-lg shadow-sm mb-6 border" open>
+                    <summary class="p-4 font-bold cursor-pointer flex justify-between items-center text-lg">
+                        <span>Filters</span>
+                        <span class="text-sm font-normal text-gray-500">Tap to expand/collapse</span>
+                    </summary>
+                    <div class="p-4 border-t grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-semibold mb-2">Departure Time</h4>
+                            <div id="departureTimeFilters" class="grid grid-cols-2 lg:grid-cols-4 gap-2"></div>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold mb-2">Available Classes</h4>
+                            <div id="classFilters" class="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2"></div>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Direct Trains Section -->
+                <div id="directTrainsContainer" class="hidden mb-8">
+                    <h2 class="text-2xl font-bold mb-4">Direct Trains <span id="directTrainCount"
+                            class="text-base font-medium text-gray-500"></span></h2>
+                    <div id="directTrainsList" class="space-y-5"></div>
+                </div>
+
+                <!-- Nearby Trains Section -->
+                <div id="nearbyTrainsContainer" class="hidden">
+                    <h2 class="text-2xl font-bold mb-4">Nearby Station Trains <span id="nearbyTrainCount"
+                            class="text-base font-medium text-gray-500"></span></h2>
+                    <div id="nearbyTrainsList" class="space-y-5"></div>
+                </div>
+
+                <!-- No Results State -->
+                <div id="noResultsState"
+                    class="hidden text-center p-8 bg-blue-50 border-2 border-dashed border-blue-200 rounded-lg">
+                    <svg class="w-12 h-12 mx-auto text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <h3 class="mt-2 text-xl font-semibold text-blue-800">No Trains Found</h3>
+                    <p class="mt-1 text-blue-600">No trains match your current search and filter criteria. Try adjusting
+                        your filters or search.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="../backend/results.js"></script>
+    <script src="../backend/navbar.js"></script>
+
+    <!-- ▼▼▼ FIX 2: SIMPLIFIED SCRIPT TO AVOID ERRORS ▼▼▼ -->
+    
+</body>
+
+</html>
